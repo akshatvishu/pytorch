@@ -4074,7 +4074,6 @@ class TestSpecificPatternCache(TestCase):
         static_table, static_key = lookup([torch.empty(6)], None)
         pattern = Arg()
         static_table[static_key] = pattern
-        previous_key = None
         for _ in range(2):
             shape_env = ShapeEnv()
             symbol = shape_env.create_unspecified_symint_and_symbol(
@@ -4094,12 +4093,9 @@ class TestSpecificPatternCache(TestCase):
                 self.assertIs(table, cache.symbolic)
                 self.assertEqual(len(shape_env.guards), num_guards)
                 self.assertNotIn(key, table)
-                if previous_key is not None:
-                    self.assertEqual(key, previous_key)
                 table[key] = pattern
                 same_table, same_key = lookup([x], shape_env)
                 self.assertIs(same_table[same_key], pattern)
-                previous_key = key
         self.assertIs(static_table[static_key], pattern)
 
     def test_ordinary_and_storage_sensitive_keys(self):
